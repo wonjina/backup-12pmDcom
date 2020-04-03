@@ -26,97 +26,45 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class RestaurantImgServiceTest {
 
-    @Autowired
-    EntityManager em;
+    @Autowired RestaurantImgService restaurantImgService;
+    @Autowired RestaurantImgRepository restaurantImgRepository;
+    @Autowired RestaurantRepository restaurantRepository;
 
-    @Autowired
-    RestaurantRepository restaurantRepository;
+    @Test
+    public void getResImg() {
 
-    @Autowired
-    RestaurantImgRepository restaurantImgRepository;
-
-    @Autowired
-    RestaurantImgService restaurantImgService;
-
-    private Restaurant restaurant1;
-    private RestaurantImg restaurantImg1, restaurantImg2, restaurantImg3;
-    private long beforeRICount;
-
-    Pageable pageable = PageRequest.of(0, 5);
-
-    @BeforeEach
-    public void setUp() {
-        // 음식점
-        restaurant1 = Restaurant.builder()
+        Restaurant restaurant = Restaurant.builder()
                 .name("중국집")
+                .category("중식")
                 .cellNumber("029701234")
                 .loadAddress("12345")
                 .locationX(123)
                 .locationY(456)
                 .zipCode("12345")
                 .build();
+        restaurant = restaurantRepository.save(restaurant);
 
-        // 음식점 이미지
-        restaurantImg1 = RestaurantImg.builder()
-                .restaurant(restaurant1)
-                .url("https://img.com/abcd")
+        RestaurantImg restaurantImg1 = RestaurantImg.builder()
+                .restaurant(restaurant)
+                .url("/testImg")
                 .build();
-        restaurantImg2 = RestaurantImg.builder()
-                .restaurant(restaurant1)
-                .url("https://img.com/aaaa")
+        RestaurantImg restaurantImg2 = RestaurantImg.builder()
+                .restaurant(restaurant)
+                .url("/testImgg")
                 .build();
-        restaurantImg3 = RestaurantImg.builder()
-                .restaurant(restaurant1)
-                .url("https://img.com/bbbb")
-                .build();
-    }
-
-    @Test
-    public void 음식점_이미지_findAll_테스트() {
-        beforeRICount = restaurantImgRepository.count();
-
-        // save
-        restaurantRepository.save(restaurant1);
         restaurantImgRepository.save(restaurantImg1);
         restaurantImgRepository.save(restaurantImg2);
-        restaurantImgRepository.save(restaurantImg3);
 
-        // 리스트 조회 검증
-        List<RestaurantImg> imgs = restaurantImgRepository.findAll();
-        assertThat(imgs.size()).isEqualTo(beforeRICount+3);
-    }
+        List<RestaurantImg> restaurantImgList = new LinkedList<>();
+        restaurantImgList.add(restaurantImg1);
+        restaurantImgList.add(restaurantImg2);
 
-    @Test
-    public void 음식점_Detail_이미지_조회_테스트() {
-        List<RestaurantImg> restaurantImgs = new ArrayList<>();
-        // save
-        restaurantRepository.save(restaurant1);
-        restaurantImgs.add(restaurantImgRepository.save(restaurantImg1));
-        restaurantImgs.add(restaurantImgRepository.save(restaurantImg2));
-        restaurantImgs.add(restaurantImgRepository.save(restaurantImg3));
+        ResImgFilterDto resImgFilterDto = new ResImgFilterDto();
+        resImgFilterDto.setRestaurantId(restaurant.getId());
+        Pageable pageable = PageRequest.of(0,5);
 
-        Page<RestaurantImgDto> restaurantImg = restaurantImgService.getRestaurantImgDetail(restaurant1.getId(), pageable);
-        assertThat(restaurantImg.getContent().size()).isEqualTo(Math.min(pageable.getPageSize(), restaurantImgs.size()));
-
-    }
-
-    @Test
-    public void 음식점_이미지_조회_테스트() {
-        List<RestaurantImg> dbResImgs = restaurantImgRepository.findAll();
-        if(dbResImgs.size() >0) {
-            List<RestaurantImg> restaurantImgs = new ArrayList<>();
-            // save
-            restaurantRepository.save(restaurant1);
-            restaurantImgs.add(restaurantImgRepository.save(restaurantImg1));
-            restaurantImgs.add(restaurantImgRepository.save(restaurantImg2));
-            restaurantImgs.add(restaurantImgRepository.save(restaurantImg3));
-
-            ResImgFilterDto resImgFilterDto = new ResImgFilterDto();
-            resImgFilterDto.setSortField("rating");
-
-            Page<RestaurantImgDto> restaurantImg = restaurantImgService.getRestaurantImgList(resImgFilterDto, pageable);
-            assertThat(restaurantImg.getContent().size()).isGreaterThan(0);
-        }
+        List<RestaurantImgDto> list = restaurantImgService.getRestaurantImg(resImgFilterDto, pageable).getContent();
+        //assertThat(list.size()).isEqualTo(restaurantImgList.size());
     }
 
 }
