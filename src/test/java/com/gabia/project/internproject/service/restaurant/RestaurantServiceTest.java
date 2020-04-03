@@ -34,86 +34,33 @@ class RestaurantServiceTest {
     RestaurantRepository restaurantRepository;
 
     @Autowired
-    MemberRepository memberRepository;
+    RestaurantImgRepository restaurantImgRepository;
 
     @Autowired
     EntityManager em;
-
+    Pageable pageable;
     @Test
-    public void 가게리스트가져오기() {
-        List<RestaurantDto> list;
-        ResFilterDto resFilterDto;
-        Pageable pageable = PageRequest.of(0, 5);
+    public void getResList() {
 
-        //음식점 저장
-        Restaurant restaurant = Restaurant.builder()
-                .name("중국집Test")
-                .cellNumber("11")
-                .loadAddress("4444")
-                .locationX(3)
-                .locationY(4)
-                .zipCode("112")
+        Restaurant sampleRestaurant = Restaurant.builder()
+                .name("중국집")
+                .category("중식")
+                .cellNumber("029701234")
+                .loadAddress("12345")
+                .locationX(123)
+                .locationY(456)
+                .zipCode("12345")
                 .build();
-        Restaurant createdRestataurant = restaurantRepository.save(restaurant);
+        sampleRestaurant = restaurantRepository.save(sampleRestaurant);
 
-        //저장된 음식점 검색
-        resFilterDto = new ResFilterDto();
-        resFilterDto.setName("중국집Test");
-        list = restaurantService.getRestaurantsList(resFilterDto, pageable).getContent();
+        pageable = PageRequest.of(0, 5);
 
-        assertThat(list.size()).isGreaterThanOrEqualTo(1);
+        ResFilterDto resFilterDto =new ResFilterDto();
+        resFilterDto.setId(sampleRestaurant.getId());
 
-        //저장된 음식점 검색
-        resFilterDto = new ResFilterDto();
-        resFilterDto.setId(restaurant.getId());
-        list = restaurantService.getRestaurantsList(resFilterDto, pageable).getContent();
-
-        assertThat(list.get(0).getRestaurantId()).isEqualTo(createdRestataurant.getId());
-    }
-
-    @Test
-    public void getDetailTest() {
-
-        //음식점 저장
-        Restaurant restaurant = Restaurant.builder()
-                .name("중국집Test")
-                .cellNumber("11")
-                .loadAddress("4444")
-                .locationX(3)
-                .locationY(4)
-                .zipCode("112")
-                .build();
-        Member member = Member.builder().name("test employee").build();
-        memberRepository.save(member);
-
-        Review rev1 = Review.builder()
-                            .comment("test comment 1")
-                            .rating(3)
-                            .member(member)
-                            .restaurant(restaurant)
-                            .build();
-
-        Review rev2 = Review.builder()
-                            .comment("test comment 2")
-                            .rating(4)
-                            .restaurant(restaurant)
-                            .member(member)
-                            .build();
-
-        //cacade 설정을 통해 review 도 저장
-        restaurant.addReview(rev1);
-        restaurant.addReview(rev2);
-
-        List<Review> reviews = new ArrayList<>();
-        reviews.add(rev1);
-        reviews.add(rev2);
-
-        Restaurant createdRestataurant = restaurantRepository.save(restaurant);
-
-
-        RestaurantDto restaurantDto = restaurantService.getRestaurantDetail(createdRestataurant.getId());
-        assertThat(restaurantDto.getName()).isEqualTo(restaurant.getName());
-        assertThat(restaurantDto.getReviewsAmount()).isEqualTo(reviews.size());
+        List<RestaurantDto> restaurants = restaurantService.getRestaurantsList(resFilterDto, pageable).getContent();
+        assertThat(1).isEqualTo(restaurants.size());
+        assertThat(restaurants.get(0).getRestaurantId()).isEqualTo(sampleRestaurant.getId());
 
     }
 
