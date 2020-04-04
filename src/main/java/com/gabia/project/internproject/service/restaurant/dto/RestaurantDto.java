@@ -43,8 +43,8 @@ public class RestaurantDto {
     private String zipCode;
 
     public RestaurantDto(Restaurant restaurant) {
-        this.rating = restaurant.getReviewsRating();
-        this.reviewsAmount = restaurant.getReviewsAmount();
+        this.rating = restaurant.getRating();
+        this.reviewsAmount = restaurant.getReviewAmount();
         this.restaurantId =restaurant.getId();
         this.name = restaurant.getName();
         this.category = restaurant.getCategory();

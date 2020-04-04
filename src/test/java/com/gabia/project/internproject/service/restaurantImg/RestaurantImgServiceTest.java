@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,7 +36,6 @@ class RestaurantImgServiceTest {
 
         Restaurant restaurant = Restaurant.builder()
                 .name("중국집")
-                .category("중식")
                 .cellNumber("029701234")
                 .loadAddress("12345")
                 .locationX(123)
@@ -60,11 +60,9 @@ class RestaurantImgServiceTest {
         restaurantImgList.add(restaurantImg2);
 
         ResImgFilterDto resImgFilterDto = new ResImgFilterDto();
-        resImgFilterDto.setRestaurantId(restaurant.getId());
         Pageable pageable = PageRequest.of(0,5);
 
-        List<RestaurantImgDto> list = restaurantImgService.getRestaurantImg(resImgFilterDto, pageable).getContent();
-        //assertThat(list.size()).isEqualTo(restaurantImgList.size());
+        List<RestaurantImgDto> list = restaurantImgService.getRestaurantImgList(resImgFilterDto, pageable).getContent();
     }
 
 }

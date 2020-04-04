@@ -1,5 +1,6 @@
 package com.gabia.project.internproject.service.restaurantImg;
 
+import com.gabia.project.internproject.common.domain.RestaurantImg;
 import com.gabia.project.internproject.common.exception.BusinessException;
 import com.gabia.project.internproject.controller.restaurant.dto.ResFilterDto;
 import com.gabia.project.internproject.controller.restaurantImg.dto.ResImgFilterDto;
@@ -35,39 +36,42 @@ public class RestaurantImgService {
     @Value("${spring.server.domain}")
     private String DOMAIN_URL;
 
-    // 음식점 이미지 조회
-    public Page<RestaurantImgDto> getRestaurantImgDetail(Integer id, Pageable pageable) throws BusinessException {
-        List<RestaurantImgDto> restaurantImgs = restaurantImgRepository.findAll(where(equalRestaurant(id)))
-                .stream()
-                .map(r -> new RestaurantImgDto(r, DOMAIN_URL))
-                .collect(Collectors.toList());
+    /**
+     * 특정 가게 이미지 상세 조회
+     * @param id : 가게 기본키
+     * @param pageable : 정렬 및 페이징
+     * @return
+     */
+    public Page<RestaurantImgDto> getRestaurantImgDetail(Integer id, Pageable pageable) {
+        Page<RestaurantImg> restaurantImgs = restaurantImgRepository.findAll(where(equalRestaurant(id)), pageable);
 
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), restaurantImgs.size());
-
-        return new PageImpl(restaurantImgs.subList(start,end), pageable, restaurantImgs.size());
+        //entity -> dto 변환 및 page list 생성
+        return new PageImpl(restaurantImgs.stream().map(r -> new RestaurantImgDto(r, DOMAIN_URL)).collect(Collectors.toList()),
+                            pageable,
+                            restaurantImgs.getTotalPages() * restaurantImgs.getSize());
     }
 
-    public Page<RestaurantImgDto> getRestaurantImgList(ResImgFilterDto resImgFilterDto, Pageable pageable) throws BusinessException {
-        ResFilterDto resFilterDto = new ResFilterDto();
-        resFilterDto.setSortField(resImgFilterDto.getSortField());
-
-        //get 식당 리스트
-        List<RestaurantDto> list = restaurantService.getRestaurantsList(resFilterDto, pageable).getContent();
-
-        //식당 id list 추출
-        List<Integer> resIds = list.stream().map(RestaurantDto::getRestaurantId).collect(Collectors.toList());
+    /**
+     * 음식점 이미지 리스트 조회
+     * @param resImgFilterDto :
+     * @param pageable : 정렬 및 페이징
+     * @return
+     * @throws BusinessException
+     */
+    public List<RestaurantImgDto> getRestaurantImgList(ResImgFilterDto resImgFilterDto, Pageable pageable) throws BusinessException {
+        //get 정렬된 식당 리스트 -> get id list
+        List<Integer> resIds = restaurantService.getRestaurantsList(new ResFilterDto(), pageable)
+                                                .getContent()
+                                                .stream()
+                                                .map(RestaurantDto::getRestaurantId)
+                                                .collect(Collectors.toList());
 
         //식당 ids 로 식당 이미지 get
-        List<RestaurantImgDto> restaurantImgs = restaurantImgRepository.findAll(where(equalRestaurant(resIds))).stream()
-                .filter(distinctByKey(resImg ->resImg.getRestaurant().getId()))
-                .map(r -> new RestaurantImgDto(r, DOMAIN_URL))
-                .collect(Collectors.toList());
-
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), restaurantImgs.size());
-
-        return new PageImpl(restaurantImgs.subList(start,end), pageable, restaurantImgs.size());
+        return restaurantImgRepository.findAll(where(equalRestaurant(resIds)))
+                                        .stream()
+                                        .filter(distinctByKey(resImg ->resImg.getRestaurant().getId())) //가게별 하나의 이미지만 list에 추가하기 위해
+                                        .map(r -> new RestaurantImgDto(r, DOMAIN_URL))
+                                        .collect(Collectors.toList());
     }
 
     private <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {

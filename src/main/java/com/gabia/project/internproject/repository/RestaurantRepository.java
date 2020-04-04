@@ -13,4 +13,9 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Integer>
 
     @EntityGraph(attributePaths = {"reviews"}, type = EntityGraph.EntityGraphType.LOAD)
     Page<Restaurant> findAll(Specification<Restaurant> spec, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"reviews"}, type = EntityGraph.EntityGraphType.LOAD)
+    Restaurant findRestaurantWithReviewsById(Integer id);
+
+
 }

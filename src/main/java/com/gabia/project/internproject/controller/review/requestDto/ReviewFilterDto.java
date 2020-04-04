@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -27,6 +28,8 @@ public class ReviewFilterDto {
 
     private Integer rating;
     private Integer id;
+
+    @NotNull
     private Integer restaurantId;
     private Integer memberId;
     private Member member;

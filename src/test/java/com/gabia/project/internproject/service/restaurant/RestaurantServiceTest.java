@@ -1,31 +1,27 @@
 package com.gabia.project.internproject.service.restaurant;
 
-import com.gabia.project.internproject.common.domain.Member;
 import com.gabia.project.internproject.common.domain.Restaurant;
-import com.gabia.project.internproject.common.domain.Review;
 import com.gabia.project.internproject.controller.restaurant.dto.ResFilterDto;
-import com.gabia.project.internproject.repository.MemberRepository;
+import com.gabia.project.internproject.repository.RestaurantImgRepository;
 import com.gabia.project.internproject.repository.RestaurantRepository;
-import com.gabia.project.internproject.service.restaurant.dto.CategoriesDto;
 import com.gabia.project.internproject.service.restaurant.dto.RestaurantDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
 @Transactional
+@Rollback(false)
 class RestaurantServiceTest {
     @Autowired
     RestaurantService restaurantService;
@@ -44,7 +40,6 @@ class RestaurantServiceTest {
 
         Restaurant sampleRestaurant = Restaurant.builder()
                 .name("중국집")
-                .category("중식")
                 .cellNumber("029701234")
                 .loadAddress("12345")
                 .locationX(123)
@@ -64,4 +59,8 @@ class RestaurantServiceTest {
 
     }
 
+    @Test
+    public void updateReviewInfo() {
+        restaurantService.updateReviewInfo();
+    }
 }

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RecruitMemberRepository extends JpaRepository<RecruitMember, Integer>, JpaSpecificationExecutor<RecruitMember> {
 /*
@@ -16,11 +17,11 @@ public interface RecruitMemberRepository extends JpaRepository<RecruitMember, In
                 type = EntityGraph.EntityGraphType.LOAD)
     List<RecruitMember> findAll(Specification<RecruitMember> spec);*/
 
-    @EntityGraph(attributePaths = {"recruitBoard", "recruitBoard.restaurant"}, type = EntityGraph.EntityGraphType.LOAD)
+    @EntityGraph(attributePaths = {"member"}, type = EntityGraph.EntityGraphType.LOAD)
     List<RecruitMember> findAll(Specification<RecruitMember> spec);
 
-    RecruitMember findRecruitMemberByRecruitBoardIdAndMemberId(int boardId, int memberId);
-    
+    Optional<RecruitMember> findRecruitMemberByRecruitBoardIdAndMemberId(int boardId, int memberId);
+
     int countRecruitMembersByRecruitBoardId(int boardId);
 
 }

@@ -78,6 +78,8 @@ class ReviewServiceTest {
                 .locationX(3)
                 .locationY(4)
                 .zipCode("112")
+                .rating(0)
+                .reviewAmount(0l)
                 .build();
         Member member = Member.builder().name("test employee").build();
         Member createdMember = memberRepository.save(member);

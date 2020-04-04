@@ -1,5 +1,6 @@
 package com.gabia.project.internproject.service.recruitMember.dto;
 
+import com.gabia.project.internproject.common.domain.RecruitBoard;
 import com.gabia.project.internproject.common.domain.RecruitMember;
 import com.gabia.project.internproject.service.recruitBoard.dto.JoinMemberDto;
 import lombok.Getter;
@@ -22,8 +23,18 @@ public class RecruitMemberDto {
         this.boardDate = recruitMember.getRecruitBoard().getDateTime();
         this.boardSubject = recruitMember.getRecruitBoard().getSubject();
         this.restaurantName = recruitMember.getRecruitBoard().getRestaurant().getName();
+
         this.joinMembers = recruitMember.getRecruitBoard().getRecruitMembers()
-                .stream().map(r -> new JoinMemberDto(r)).collect(Collectors.toList());
+                                                            .stream()
+                                                            .map(JoinMemberDto::new)
+                                                            .collect(Collectors.toList());
     }
 
+    public RecruitMemberDto(RecruitBoard recruitBoard, List<RecruitMember> members) {
+        this.boardId = recruitBoard.getId();
+        this.boardDate = recruitBoard.getDateTime();
+        this.boardSubject = recruitBoard.getSubject();
+        this.restaurantName = recruitBoard.getRestaurant().getName();
+        this.joinMembers = members.stream().map(JoinMemberDto::new).collect(Collectors.toList());;
+    }
 }

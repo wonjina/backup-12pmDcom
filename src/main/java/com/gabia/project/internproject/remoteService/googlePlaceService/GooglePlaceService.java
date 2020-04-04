@@ -151,6 +151,8 @@ public class GooglePlaceService {
                                 restaurants.get(0).addReview(reviews.get(0));
                             }
                         }
+                        restaurants.get(0).updateRating();
+                        restaurants.get(0).updateReviewsAmount();
                     }
 
                     if(members.size() > 0) {

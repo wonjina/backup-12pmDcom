@@ -17,6 +17,8 @@ public interface RestaurantMapper {
     @Mapping(source = "formatted_phone_number", target = "cellNumber", qualifiedByName = "stringToDateTime")
     @Mapping(source = "geometry.location.lng", target = "locationY")
     @Mapping(source = "geometry.location.lat", target = "locationX")
+    @Mapping(target="reviewAmount", ignore = true)
+    @Mapping(target="rating", ignore = true)
     @Mapping(target="zipCode", ignore = true)
     Restaurant toEntity(GoogleDetailDao googlePlaceDao);
 

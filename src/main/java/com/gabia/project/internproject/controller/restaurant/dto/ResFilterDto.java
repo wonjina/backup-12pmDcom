@@ -16,10 +16,4 @@ public class ResFilterDto {
     @JsonProperty(value = "restaurant_id")
     private Integer id;
 
-    @JsonProperty(value = "sort_field")
-    private String sortField;
-
-    @JsonProperty(value = "sort_by")
-    private String sortBy;
-
 }

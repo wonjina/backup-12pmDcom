@@ -1,9 +1,9 @@
 package com.gabia.project.internproject.service.restaurant;
 
+import com.gabia.project.internproject.common.domain.Restaurant;
 import com.gabia.project.internproject.common.helper.Notification;
 import com.gabia.project.internproject.controller.restaurant.dto.ResFilterDto;
 import com.gabia.project.internproject.repository.RestaurantRepository;
-import com.gabia.project.internproject.service.restaurant.dto.CategoriesDto;
 import com.gabia.project.internproject.service.restaurant.dto.RestaurantDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,14 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.gabia.project.internproject.common.helper.customSpecifications.RestaurantSpecifications.equalsRestaurantId;
@@ -36,74 +29,48 @@ public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
 
+    /**
+     * 가게 리스트 정보
+     * @param resFilterDto 가게이름 , 가게 id
+     * @param pageable : 정렬 및 페이징
+     * @return
+     */
     public Page<RestaurantDto> getRestaurantsList(ResFilterDto resFilterDto, Pageable pageable) {
-        List<RestaurantDto> restaurants = restaurantRepository.findAll(where(fetchReview())
-                                                            .and(equalsRestaurantName(resFilterDto.getName()))
-                                                            .and(equalsRestaurantId(resFilterDto.getId()))
-                                                    ).stream()
-                                                    .filter(distinctByKey(r -> r.getId()))
-                                                    .map( r -> new RestaurantDto(r))
-                                                    .collect(Collectors.toList());
-
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), restaurants.size());
-
-        if(resFilterDto.getSortField() != null && resFilterDto.getSortField().equals("review")) {
-            this.sortByReviewAmountList(restaurants);
-        } else /*if(resFilterDto.getSortField() != null && resFilterDto.getSortField().equals("rating"))*/{
-            this.sortByRatingList(restaurants);
-        }
-
-        return new PageImpl(  restaurants.subList(start, end)
-                , pageable
-                , restaurants.size());
-    }
-
-
-    public RestaurantDto getRestaurantDetail(Integer id) {
-        return restaurantRepository.findOne(where(fetchReview())
-                                            .and(equalsRestaurantId(id)))
-                            .map(RestaurantDto::new)
-                            .orElseThrow(() ->
-                                    new HttpClientErrorException(HttpStatus.NOT_FOUND, Notification.NOT_FOUND.getMsg()));
+        List<RestaurantDto> restaurantDtos = restaurantRepository.findAll(where(equalsRestaurantName(resFilterDto.getName()))
+                                                                                .and(equalsRestaurantId(resFilterDto.getId())),
+                                                                            pageable
+                                                                        ).getContent()
+                                                                        .stream()
+                                                                        .map(RestaurantDto::new)
+                                                                        .collect(Collectors.toList());
+        return new PageImpl(restaurantDtos
+                            , pageable
+                            , restaurantRepository.count());
     }
 
     /**
-     *  Stream 시 중복체크
+     * 가게 상세정보
+     * @param id  : 가게 기본키
+     * @return
      */
-    private <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
-        Map<Object, Boolean> map = new HashMap<>();
-        return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    public RestaurantDto getRestaurantDetail(Integer id) {
+        return restaurantRepository.findOne(where(fetchReview())
+                                            .and(equalsRestaurantId(id)))
+                                    .map(RestaurantDto::new)
+                                    .orElseThrow(() ->
+                                            new HttpClientErrorException(HttpStatus.NOT_FOUND, Notification.NOT_FOUND.getMsg()));
     }
 
-    private void sortByRatingList(List<RestaurantDto> restaurants) {
-        Collections.sort(restaurants, new Comparator<RestaurantDto>() {
-            @Override
-            public int compare(RestaurantDto res1, RestaurantDto res2) {
-                if(res2.getRating() > res1.getRating()) {
-                    return 1;
-                } else if(res2.getRating() == res1.getRating()) {
-                    return 0;
-                } else {
-                    return -1;
-                }
-            }
-        });
-    }
-
-    private void sortByReviewAmountList(List<RestaurantDto> restaurants) {
-        Collections.sort(restaurants, new Comparator<RestaurantDto>() {
-            @Override
-            public int compare(RestaurantDto res1, RestaurantDto res2) {
-                if(res2.getReviewsAmount() > res1.getReviewsAmount()) {
-                    return 1;
-                } else if(res2.getReviewsAmount() == res1.getReviewsAmount()) {
-                    return 0;
-                } else {
-                    return -1;
-                }
-            }
-        });
+    /**
+     * 가게별 리뷰 갯수, 평점 update
+     */
+    @Transactional
+    public void updateReviewInfo() {
+        List<Restaurant> restaurantList= restaurantRepository.findAll(where(fetchReview()));
+        restaurantList.stream().peek(r -> {
+                                        r.updateRating();
+                                        r.updateReviewsAmount();
+                                    });
     }
 
 }

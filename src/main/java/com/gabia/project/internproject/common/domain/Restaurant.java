@@ -49,6 +49,12 @@ public class Restaurant extends BaseTimeEntity{
     @Column(name = "location_y")
     private double locationY;
 
+    @Column(name = "review_amount")
+    private Long reviewAmount;
+
+    @Column(name = "rating")
+    private double rating;
+
     @NotBlank(message = "가게 이름을 입력해주세요")
     private String name;
 
@@ -61,23 +67,20 @@ public class Restaurant extends BaseTimeEntity{
                       String zipCode,
                       double locationX,
                       double locationY,
-                      String name) {
+                      String name,
+                      Long reviewAmount,
+                      double rating) {
         this.cellNumber = cellNumber;
         this.loadAddress = loadAddress;
         this.zipCode = zipCode;
         this.locationX = locationX;
         this.locationY = locationY;
         this.name = name;
+        this.reviewAmount = reviewAmount;
+        this.rating = rating;
     }
     private Restaurant(int id) {
         this.id = id;
-    }
-
-    public static Restaurant of(int id) {
-        if(id <= 0) {
-            return null;
-        }
-        return new Restaurant(id);
     }
 
     public static Restaurant of(Integer id) {
@@ -112,10 +115,12 @@ public class Restaurant extends BaseTimeEntity{
         return Math.round((sum/this.getReviewsAmount())*10)/10.0;
     }
 
-    public Restaurant(String loadAddress, String category, String name) {
-        this.loadAddress = loadAddress;
-        this.category = category;
-        this.name = name;
+    public void updateReviewsAmount() {
+        this.reviewAmount = (long) reviews.size();
+    }
+
+    public void updateRating() {
+        this.rating = getReviewsRating();
     }
 
     public boolean changeCellNumber(String newNumber) {
@@ -140,7 +145,6 @@ public class Restaurant extends BaseTimeEntity{
     public boolean changeLocation(int x, int y) {
         this.locationY = y;
         this.locationX = x;
-        /*주소 변경 로직 추가*/
         return true;
     }
 

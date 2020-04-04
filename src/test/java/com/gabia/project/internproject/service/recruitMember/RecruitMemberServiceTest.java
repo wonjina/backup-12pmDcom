@@ -249,7 +249,7 @@ class RecruitMemberServiceTest {
         System.out.println(recruitBoardTest.getRecruitMembers().size());
 
         //member1 참여 취소
-        recruitMemberService.leavePost(recruitBoard.getId(), member1.getId());
+        recruitBoardService.leavePost(recruitBoard.getId(), member1.getId());
 
         em.flush();
         em.clear();
@@ -260,7 +260,7 @@ class RecruitMemberServiceTest {
         assertThat(RecruitMember1.size()).isEqualTo(beforeRmCount+1); // 남은 인원 1명
 
         //member2 참여 취소
-        recruitMemberService.leavePost(recruitBoard.getId(), member2.getId());
+        recruitBoardService.leavePost(recruitBoard.getId(), member2.getId());
 
         List<RecruitBoard> board2 = recruitBoardRepository.findAll();
         assertThat(board2.size()).isEqualTo(beforeRbCount); // 모집글 0개
@@ -315,10 +315,7 @@ class RecruitMemberServiceTest {
         assertThat(RecruitMember.size()).isEqualTo(beforeRmCount+4);
 
         // 정상 참여 취소
-        recruitMemberService.leavePost(recruitBoard.getId(), member1.getId());
-
-        // 비정상 참여 취소 - 잘못된 참여 정보
-        // recruitMemberService.leavePost(recruitBoard3.getId(), member1.getId()); -> error
+        recruitBoardService.leavePost(recruitBoard.getId(), member1.getId());
 
     }
 
@@ -349,14 +346,14 @@ class RecruitMemberServiceTest {
         LocalDateTime tomorrow = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(0,0,01)); // 내일 00:00:01
 
         // Date 파라미터 값이 있을 경우
-        Page<RecruitMemberDto> todayBoards = recruitMemberService.getUserRecord(today, member1.getId(), pageable);
+        Page<RecruitMemberDto> todayBoards = recruitBoardService.getUserRecord(today, member1.getId(), pageable);
         assertThat(todayBoards.getContent().size()).isEqualTo(1);
 
-        Page<RecruitMemberDto> tomorrowBoards = recruitMemberService.getUserRecord(tomorrow, member1.getId(), pageable);
+        Page<RecruitMemberDto> tomorrowBoards = recruitBoardService.getUserRecord(tomorrow, member1.getId(), pageable);
         assertThat(tomorrowBoards.getContent().size()).isEqualTo(0);
 
         // Date 파라미터 값이 없을 경우
-        Page<RecruitMemberDto> AllBoards = recruitMemberService.getUserRecord(null, member1.getId(), pageable);
+        Page<RecruitMemberDto> AllBoards = recruitBoardService.getUserRecord(null, member1.getId(), pageable);
         assertThat(AllBoards.getContent().size()).isEqualTo(1);
     }
 

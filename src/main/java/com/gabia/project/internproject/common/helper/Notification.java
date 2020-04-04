@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum Notification {
 
-    SUCCESS_POST("등록 완료되었습니다."),
+    SUCCESS_POST("등록 되었습니다."),
     SUCCESS_JOIN("참여되었습니다."),
     SUCCESS_CANCEL("취소되었습니다."),
     SUCCESS_DELETE("삭제되었습니다."),

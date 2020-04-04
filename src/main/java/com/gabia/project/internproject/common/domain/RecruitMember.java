@@ -1,5 +1,6 @@
 package com.gabia.project.internproject.common.domain;
 
+import io.jsonwebtoken.lang.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -58,4 +59,21 @@ public class RecruitMember {
         }
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof RecruitMember) {
+            RecruitMember recruitMember = (RecruitMember) obj;
+            if(recruitMember.id == this.id) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
 }
