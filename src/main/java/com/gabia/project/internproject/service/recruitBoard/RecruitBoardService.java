@@ -28,7 +28,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.gabia.project.internproject.common.helper.customSpecifications.RecruitBoardSpecification.*;
+import static com.gabia.project.internproject.common.helper.customSpecifications.RecruitBoardSpecification.equalRecMember;
+import static com.gabia.project.internproject.common.helper.customSpecifications.RecruitBoardSpecification.equalRecruitBoard;
+import static com.gabia.project.internproject.common.helper.customSpecifications.RecruitBoardSpecification.greaterThanDateTime;
+import static com.gabia.project.internproject.common.helper.customSpecifications.RecruitMemberSpecification.equalMember;
+import static com.gabia.project.internproject.common.helper.customSpecifications.RecruitMemberSpecification.equalRecruitBoardNMember;
 import static org.springframework.data.jpa.domain.Specification.where;
 
 @Service
@@ -47,16 +51,13 @@ public class RecruitBoardService {
      * @return
      */
     public RecruitBoardDto getRecruitmentDetail(int id) {
-
         RecruitBoard recruitBoard = recruitBoardRepository.findRecruitBoardById(id)
                                         .orElseThrow(() -> new BusinessException(Notification.NOT_FOUND_BOARD.getMsg()));
-        RecruitBoardDto recruitBoardDto = new RecruitBoardDto(recruitBoard);
-
-        return recruitBoardDto;
+        return new RecruitBoardDto(recruitBoard);
     }
 
     /**
-     * 게시글 저회
+     * 게시글 조회
      * @param localDateTime : 날짜 필터
      * @param pageable : 정렬 및 페이징
      * @return
@@ -107,26 +108,14 @@ public class RecruitBoardService {
      */
     public Page<RecruitMemberDto> getUserRecord(LocalDateTime localDateTime, int memberId, Pageable pageable) throws BusinessException {
         //존재하는 사용자인지 검증
-        memberRepository.findById(memberId).orElseThrow(() -> new BusinessException(Notification.NOT_FOUND_MEMBER.getMsg()));
+        Member user = memberRepository.findById(memberId).orElseThrow(() -> new BusinessException(Notification.NOT_FOUND_MEMBER.getMsg()));
 
         // 사용자가 참여한 게시글 리스트
-        Page<RecruitBoard> boards = recruitBoardRepository.findMyBoardsByRecruitMembers(where(equalRecMember(memberId))
-                                                                                                .and(greaterThanDateTime(localDateTime))
-                                                                                        , pageable);
+        Page<RecruitBoard> boards = recruitBoardRepository.findAll(where(equalRecMember(memberId))
+                                                                            .and(greaterThanDateTime(localDateTime))
+                                                                    , pageable);
 
-        //참여중인 게시글 기본키 리스트 생성
-        List<Integer> boardIds = boards.stream().map(RecruitBoard::getId).collect(Collectors.toList());
-
-        //게시글 리스트 참여멤버 정보와 같이 조회
-        List<RecruitBoard> recBoardsWithAttendMember = recruitBoardRepository.findAll(where(equalRecruitBoard(boardIds)));
-        Map<Integer, RecruitBoard> map = recBoardsWithAttendMember.stream()
-                .collect(Collectors.toMap(RecruitBoard::getId, recruitBoard -> recruitBoard));
-
-        List<RecruitMemberDto> recruitMemberDtos = new ArrayList<>();
-        for (RecruitBoard board : boards) {
-            recruitMemberDtos.add(new RecruitMemberDto(board, map.get(board.getId()).getRecruitMembers()));
-        }
-
+        List<RecruitMemberDto> recruitMemberDtos = boards.stream().map(RecruitMemberDto::new).collect(Collectors.toList());
         return new PageImpl(recruitMemberDtos, pageable, boards.getTotalPages()*boards.getSize());
     }
 

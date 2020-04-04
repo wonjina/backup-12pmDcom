@@ -32,7 +32,7 @@ public class RecruitBoardDto {
         this.maxNumber = recruitBoard.getMaxNumber();
         this.countMember = recruitBoard.getAttendMemberCount();
         this.joinMembers = recruitBoard.getRecruitMembers()
-                .stream().map(r -> new JoinMemberDto(r)).collect(Collectors.toList());
+                .stream().map(JoinMemberDto::new).collect(Collectors.toList());
     }
 
 }

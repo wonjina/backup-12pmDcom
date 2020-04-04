@@ -1,6 +1,5 @@
 package com.gabia.project.internproject.controller.recruitMember;
 
-import com.gabia.project.internproject.common.domain.RecruitBoard;
 import com.gabia.project.internproject.common.exception.BusinessException;
 import com.gabia.project.internproject.controller.dto.ResponseDto;
 import com.gabia.project.internproject.service.recruitBoard.RecruitBoardService;

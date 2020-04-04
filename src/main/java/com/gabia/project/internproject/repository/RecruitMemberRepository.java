@@ -1,5 +1,6 @@
 package com.gabia.project.internproject.repository;
 
+import com.gabia.project.internproject.common.domain.RecruitBoard;
 import com.gabia.project.internproject.common.domain.RecruitMember;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,16 +13,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RecruitMemberRepository extends JpaRepository<RecruitMember, Integer>, JpaSpecificationExecutor<RecruitMember> {
-/*
-    @EntityGraph(attributePaths = {"recruitBoard", "recruitBoard.restaurant", "recruitBoard.recruitMembers.member"},
-                type = EntityGraph.EntityGraphType.LOAD)
-    List<RecruitMember> findAll(Specification<RecruitMember> spec);*/
 
-    @EntityGraph(attributePaths = {"member"}, type = EntityGraph.EntityGraphType.LOAD)
+    @EntityGraph(attributePaths = {"recruitBoard", "member"}, type = EntityGraph.EntityGraphType.LOAD)
     List<RecruitMember> findAll(Specification<RecruitMember> spec);
 
-    Optional<RecruitMember> findRecruitMemberByRecruitBoardIdAndMemberId(int boardId, int memberId);
+    @EntityGraph(attributePaths = {"recruitBoard", "member"}, type = EntityGraph.EntityGraphType.LOAD)
+    Page<RecruitMember> findAll(Specification<RecruitMember> spec, Pageable pageable);
 
-    int countRecruitMembersByRecruitBoardId(int boardId);
+    Optional<RecruitMember> findRecruitMemberByRecruitBoardIdAndMemberId(int boardId, int memberId);
 
 }

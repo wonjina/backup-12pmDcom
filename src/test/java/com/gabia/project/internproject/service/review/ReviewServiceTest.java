@@ -2,7 +2,6 @@ package com.gabia.project.internproject.service.review;
 
 import com.gabia.project.internproject.common.domain.Member;
 import com.gabia.project.internproject.common.domain.Restaurant;
-import com.gabia.project.internproject.common.domain.Review;
 import com.gabia.project.internproject.controller.review.requestDto.ReviewFilterDto;
 import com.gabia.project.internproject.controller.review.requestDto.ReviewPostDto;
 import com.gabia.project.internproject.repository.MemberRepository;
@@ -15,18 +14,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gabia.project.internproject.common.helper.customSpecifications.ReviewSpecifications.*;
-import static com.gabia.project.internproject.common.helper.customSpecifications.ReviewSpecifications.equalsReviewId;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.data.jpa.domain.Specification.where;
-
 @SpringBootTest
 @Transactional
 class ReviewServiceTest {
@@ -54,18 +48,20 @@ class ReviewServiceTest {
                 .loadAddress("4444")
                 .locationX(3)
                 .locationY(4)
+                .reviewAmount(0l)
+                .rating(0)
                 .zipCode("112")
                 .build();
         Member member = Member.builder().name("test employee").build();
         Member createdMember = memberRepository.save(member);
         Restaurant createdRestataurant = restaurantRepository.save(restaurant);
 
+        long count = reviewRepository.count();
         //리뷰 작성
         ReviewPostDto reviewPostDto = new ReviewPostDto("test commment", 1, createdMember.getId(), createdRestataurant.getId());
-        int result = reviewService.writeReview(reviewPostDto);
+        reviewService.writeReview(reviewPostDto);
 
-        //작성한 리뷰 검색
-        assertThat(result).isEqualTo(reviewRepository.findById(result).get().getId());
+        assertThat(count+1).isEqualTo(reviewRepository.count());
 
     }
 
@@ -85,7 +81,7 @@ class ReviewServiceTest {
         Member createdMember = memberRepository.save(member);
         Restaurant createdRestataurant = restaurantRepository.save(restaurant);
 
-        List<Integer> ids = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
 
         //리뷰 저장
         ReviewPostDto reviewPostDto = new ReviewPostDto("test commment", 1, createdMember.getId(), createdRestataurant.getId());

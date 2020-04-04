@@ -62,7 +62,7 @@ class RestaurantImgServiceTest {
         ResImgFilterDto resImgFilterDto = new ResImgFilterDto();
         Pageable pageable = PageRequest.of(0,5);
 
-        List<RestaurantImgDto> list = restaurantImgService.getRestaurantImgList(resImgFilterDto, pageable).getContent();
+        List<RestaurantImgDto> list = restaurantImgService.getRestaurantImgList(resImgFilterDto, pageable);
     }
 
 }

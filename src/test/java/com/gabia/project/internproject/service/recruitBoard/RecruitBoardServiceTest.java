@@ -11,13 +11,14 @@ import com.gabia.project.internproject.repository.RecruitMemberRepository;
 import com.gabia.project.internproject.repository.RestaurantRepository;
 import com.gabia.project.internproject.service.recruitBoard.dto.RecruitBoardDto;
 import com.gabia.project.internproject.service.recruitBoard.dto.RecruitBoardListDto;
+import com.gabia.project.internproject.service.recruitMember.dto.RecruitMemberDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -25,6 +26,7 @@ import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,47 +59,7 @@ class RecruitBoardServiceTest {
     private RecruitMember recruitMember1, recruitMember2;
     private long beforeRbCount, beforeRmCount;
 
-    Pageable pageable = new Pageable() {
-        @Override
-        public int getPageNumber() {
-            return 0;
-        }
-
-        @Override
-        public int getPageSize() {
-            return 4;
-        }
-
-        @Override
-        public long getOffset() {
-            return 0;
-        }
-
-        @Override
-        public Sort getSort() {
-            return null;
-        }
-
-        @Override
-        public Pageable next() {
-            return null;
-        }
-
-        @Override
-        public Pageable previousOrFirst() {
-            return null;
-        }
-
-        @Override
-        public Pageable first() {
-            return null;
-        }
-
-        @Override
-        public boolean hasPrevious() {
-            return false;
-        }
-    };
+    Pageable pageable = PageRequest.of(0,5);
 
     @BeforeEach
     public void setUp() {
@@ -109,6 +71,8 @@ class RecruitBoardServiceTest {
                 .locationX(123)
                 .locationY(456)
                 .zipCode("12345")
+                .reviewAmount(0l)
+                .rating(0)
                 .build();
 
         // 게시글
@@ -146,9 +110,8 @@ class RecruitBoardServiceTest {
                 .build();
     }
 
-
     @Test
-    void 모집글_상세조회_Service_테스트(){
+    void  특정_게시글_상세_정보_Service_테스트(){
         //save
         restaurantRepository.save(restaurant);
         recruitBoardRepository.save(recruitBoard1);
@@ -157,8 +120,6 @@ class RecruitBoardServiceTest {
         memberRepository.save(member2);
         recruitMemberRepository.save(recruitMember1);
         recruitMemberRepository.save(recruitMember2);
-
-        em.flush();
 
         RecruitBoardDto detailRecruit1 = recruitBoardService.getRecruitmentDetail(recruitBoard1.getId());
         assertThat(detailRecruit1.getBoardSubject()).isEqualTo(recruitBoard1.getSubject()); //recruitBoard1의 제목
@@ -181,8 +142,6 @@ class RecruitBoardServiceTest {
         recruitMemberRepository.save(recruitMember1);
         recruitMemberRepository.save(recruitMember2);
 
-        em.flush();
-        em.clear();
 
         LocalDateTime today = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,01)); // 오늘 00:00:01
         LocalDateTime tomorrow = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(0,0,01)); // 내일 00:00:01
@@ -196,7 +155,7 @@ class RecruitBoardServiceTest {
     }
 
     @Test
-    void 모집글_쓰기_Service_테스트() throws Exception {
+    void 모집글_쓰기_Service_테스트() {
         beforeRbCount = recruitBoardRepository.count();
         beforeRmCount = recruitMemberRepository.count();
 
@@ -208,11 +167,11 @@ class RecruitBoardServiceTest {
 
         // 새 모집글
         recruitBoardService.newPost(PostRequestDto.builder()
-                .restaurantId(restaurant.getId())
-                .memberId(member1.getId())
-                .subject("오늘은 햄버거")
-                .maxNumber(5)
-                .build());
+                                                .restaurantId(restaurant.getId())
+                                                .memberId(member1.getId())
+                                                .subject("오늘은 햄버거")
+                                                .maxNumber(5)
+                                                .build());
 
         em.flush();
         em.clear();
@@ -222,6 +181,60 @@ class RecruitBoardServiceTest {
 
         List<RecruitMember> member = recruitMemberRepository.findAll();
         assertThat(member.size()).isEqualTo(beforeRmCount+1);
+    }
+
+    @Test
+    void 사용자가_참여해온_게시글_리스트() {
+        restaurantRepository.save(restaurant);
+
+        Member memTest = memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        recruitBoardRepository.save(recruitBoard1);
+        recruitBoard1.addRecruitMember(recruitMemberRepository.save(recruitMember1));
+        recruitBoard1.addRecruitMember(recruitMemberRepository.save(RecruitMember.builder().member(member2).recruitBoard(recruitBoard1).build()));
+
+
+        List<RecruitMemberDto> recruitMembers = recruitBoardService.getUserRecord(null, memTest.getId(), pageable).getContent();
+        assertThat(recruitMembers.size()).isEqualTo(1);
+        assertThat(recruitMembers.get(0).getJoinMembers().size()).isEqualTo(2);
+    }
+
+
+    @Test
+    public void 모집글_참여_취소_Service_테스트() throws Exception {
+        beforeRbCount = recruitBoardRepository.count();
+        beforeRmCount = recruitMemberRepository.count();
+
+        //save
+        restaurantRepository.save(restaurant);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        recruitBoardRepository.save(recruitBoard1);
+
+
+        recruitBoard1.addRecruitMember(recruitMemberRepository.save(RecruitMember.builder()
+                .recruitBoard(recruitBoard1)
+                .member(member1)
+                .build()));
+        recruitBoard1.addRecruitMember(recruitMemberRepository.save(RecruitMember.builder()
+                .recruitBoard(recruitBoard1)
+                .member(member2)
+                .build()));
+
+        assertThat(recruitMemberRepository.count()).isEqualTo(beforeRmCount+2); // 남은 인원 2명
+        //member1 참여 취소
+        recruitBoardService.leavePost(recruitBoard1.getId(), member1.getId());
+
+        assertThat(recruitBoardRepository.count()).isEqualTo(beforeRbCount+1); // 모집글 1개
+        assertThat(recruitMemberRepository.count()).isEqualTo(beforeRmCount+1); // 남은 인원 1명
+
+        //member2 참여 취소
+        recruitBoardService.leavePost(recruitBoard1.getId(), member2.getId());
+
+        assertThat(recruitBoardRepository.count()).isEqualTo(beforeRbCount); // 모집글 0개
+        assertThat(recruitMemberRepository.count()).isEqualTo(beforeRmCount); // 남은 인원 0명
     }
 
 }

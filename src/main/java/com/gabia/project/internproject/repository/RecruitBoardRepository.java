@@ -20,7 +20,9 @@ public interface RecruitBoardRepository extends JpaRepository<RecruitBoard, Inte
     @EntityGraph(attributePaths = {"restaurant"}, type = EntityGraph.EntityGraphType.LOAD)
     Page<RecruitBoard> findMyBoardsByRecruitMembers(Specification<RecruitBoard> spec, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"recruitMembers", "recruitMembers.member"}, type = EntityGraph.EntityGraphType.LOAD)
+    @EntityGraph(attributePaths = {"restaurant", "recruitMembers"}, type = EntityGraph.EntityGraphType.LOAD)
     List<RecruitBoard> findAll(Specification<RecruitBoard> spec);
 
+    @EntityGraph(attributePaths = {"restaurant", "recruitMembers", "recruitMembers.member"}, type = EntityGraph.EntityGraphType.LOAD)
+    Page<RecruitBoard> findAll(Specification<RecruitBoard> spec, Pageable pageable);
 }

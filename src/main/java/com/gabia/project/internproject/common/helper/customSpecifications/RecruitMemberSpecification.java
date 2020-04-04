@@ -1,5 +1,6 @@
 package com.gabia.project.internproject.common.helper.customSpecifications;
 
+import com.gabia.project.internproject.common.domain.RecruitBoard;
 import com.gabia.project.internproject.common.domain.RecruitBoard_;
 import com.gabia.project.internproject.common.domain.RecruitMember;
 import com.gabia.project.internproject.common.domain.RecruitMember_;
@@ -33,6 +34,13 @@ public class RecruitMemberSpecification {
             root.fetch(RecruitMember_.MEMBER);
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    public static Specification<RecruitMember> equalRecruitBoardNMember(List<Integer> value) {
+        if(value == null || value.size() == 0) {
+            return null;
+        }
+        return (root, query, cb) -> root.get(RecruitMember_.RECRUIT_BOARD).in(value);
     }
 
 }

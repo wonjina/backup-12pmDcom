@@ -4,6 +4,7 @@ import com.gabia.project.internproject.common.domain.Member;
 import com.gabia.project.internproject.common.domain.RecruitBoard;
 import com.gabia.project.internproject.common.domain.RecruitMember;
 import com.gabia.project.internproject.common.domain.Restaurant;
+import com.gabia.project.internproject.common.exception.BusinessException;
 import com.gabia.project.internproject.repository.MemberRepository;
 import com.gabia.project.internproject.repository.RecruitBoardRepository;
 import com.gabia.project.internproject.repository.RecruitMemberRepository;
@@ -129,7 +130,7 @@ class RecruitBoardRepositoryTest {
     }
 
     @Test
-    public void 엔티티_연관관계_메소드_테스트() {
+    public void 엔티티_연관관계_메소드_테스트() throws Exception {
         beforeRbCount = recruitBoardRepository.count();
         beforeRmCount = recruitMemberRepository.count();
 
@@ -149,7 +150,7 @@ class RecruitBoardRepositoryTest {
         RecruitBoard detailRecruit1 = recruitBoardRepository.findById(recruitBoard1.getId()).get();
         assertThat(detailRecruit1.getAttendMemberCount()).isEqualTo(recruitBoard1.getRecruitMembers().size());
 
-        RecruitBoard recruitBoardTest = recruitBoardRepository.findRecruitBoardById(recruitBoard1.getId());
+        RecruitBoard recruitBoardTest = recruitBoardRepository.findRecruitBoardById(recruitBoard1.getId()).orElseThrow(Exception::new);
 
         assertThat(recruitBoardTest.getRecruitMembers().get(0).getId()).isEqualTo(recruitMember1.getId());
 
@@ -169,7 +170,7 @@ class RecruitBoardRepositoryTest {
     }
 
     @Test
-    public void 모집글_상세조회_테스트() {
+    public void 모집글_상세조회_테스트() throws Exception {
         // save
         restaurantRepository.save(restaurant);
         recruitBoardRepository.save(recruitBoard1);
@@ -182,13 +183,13 @@ class RecruitBoardRepositoryTest {
         em.flush();
         em.clear();
 
-        RecruitBoard detailRecruit1 = recruitBoardRepository.findRecruitBoardById(recruitBoard1.getId());
+        RecruitBoard detailRecruit1 = recruitBoardRepository.findRecruitBoardById(recruitBoard1.getId()).orElseThrow(Exception::new);
         assertThat(detailRecruit1.getRestaurant().getName()).isEqualTo(recruitBoard1.getRestaurant().getName()); // recruitBoard1의 음식점 이름
         assertThat(detailRecruit1.getSubject()).isEqualTo(recruitBoard1.getSubject()); // recruitBoard1의 제목
         assertThat(detailRecruit1.getMaxNumber()).isEqualTo(recruitBoard1.getMaxNumber()); // recruitBoard1의 최대인원
         assertThat(detailRecruit1.getAttendMemberCount()).isEqualTo(2); // recruitBoard1의 참여인원
 
-        RecruitBoard detailRecruit2 = recruitBoardRepository.findRecruitBoardById(recruitBoard2.getId());
+        RecruitBoard detailRecruit2 = recruitBoardRepository.findRecruitBoardById(recruitBoard2.getId()).orElseThrow(Exception::new);
         assertThat(detailRecruit2.getRestaurant().getName()).isEqualTo(recruitBoard2.getRestaurant().getName()); // recruitBoard2의 음식점 이름
         assertThat(detailRecruit2.getSubject()).isEqualTo(recruitBoard2.getSubject()); // recruitBoard2의 제목
         assertThat(detailRecruit2.getMaxNumber()).isEqualTo(recruitBoard2.getMaxNumber()); // recruitBoard2의 최대인원
