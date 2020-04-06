@@ -8,15 +8,24 @@ import com.gabia.project.internproject.controller.restaurant.dto.ResFilterDto;
 import com.gabia.project.internproject.repository.MemberRepository;
 import com.gabia.project.internproject.repository.RestaurantRepository;
 import com.gabia.project.internproject.repository.ReviewRepository;
+import org.hibernate.Session;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceContextType;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -25,6 +34,7 @@ import static org.springframework.data.jpa.domain.Specification.where;
 
 @SpringBootTest
 @Transactional
+@Rollback(false)
 class RestaurantRepositoryTest {
 
     @Autowired
@@ -38,9 +48,11 @@ class RestaurantRepositoryTest {
 
     private Long beforeCount;
 
-    @Autowired
-    EntityManager em;
+    @PersistenceContext(type = PersistenceContextType.EXTENDED)
+    private EntityManager em;
 
+    @Autowired
+    JdbcTemplate jdbcTemplate;
 
     @Test
     public void specification테스트() {
@@ -130,6 +142,8 @@ class RestaurantRepositoryTest {
                 .loadAddress("12345")
                 .locationX(123)
                 .locationY(456)
+                .rating(0)
+                .reviewAmount(0l)
                 .zipCode("12345")
                 .build();
         Restaurant restaurant2 = Restaurant.builder()
@@ -138,6 +152,8 @@ class RestaurantRepositoryTest {
                 .loadAddress("12312")
                 .locationX(121)
                 .locationY(100.3)
+                .rating(0)
+                .reviewAmount(0l)
                 .zipCode("45678")
                 .build();
         restaurantRepository.save(restaurant1);
@@ -164,4 +180,38 @@ class RestaurantRepositoryTest {
         assertThat(deletedCount).isEqualTo(beforeCount);
     }
 
+
+    @Test
+    public void jdbcTemlateBatchTest() {
+        int batchSize = 20;
+
+        int batchCount =0;
+        List<Member> list = new ArrayList<>();
+        for(int i=0; i<40;++i) {
+            list.add(Member.builder().name(""+i).build());
+            if( (i+1)%batchSize == 0) {
+                batchCount = batchInsert(batchCount, list);
+            }
+        }
+        if (!list.isEmpty()) {
+            batchCount = batchInsert(batchCount, list);
+        }
+    }
+
+    int batchInsert(int batchCount, List<Member> subItems) {
+        jdbcTemplate.batchUpdate("INSERT INTO member (`name`) VALUES (?)",
+                new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setString(1, subItems.get(i).getName());
+                    }
+                    @Override
+                    public int getBatchSize() {
+                        return subItems.size();
+                    }
+                });
+        subItems.clear();
+        batchCount++;
+        return batchCount;
+    }
 }

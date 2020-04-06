@@ -5,14 +5,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -22,10 +17,16 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@TableGenerator(
+        name="RESTAURANT_SEQ_GENERATOR",   //자바 내에서 사용할 논리적인 시퀀스 이름, @GeneratedValue의 generator와 매핑
+        table = "MY_SEQUENCES",
+        pkColumnValue = "RESTAURANT_SEQ",    //필드 중 어떤 필드값과 매팽시킬것인지 지정
+        allocationSize = 500                //JPA에서 insert처리 시 마다 키값을 얼마나 증가시킬지 지정
+)
 public class Restaurant extends BaseTimeEntity{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "RESTAURANT_SEQ_GENERATOR")
     @Column(name = "restaurant_id")
     private int id;
 

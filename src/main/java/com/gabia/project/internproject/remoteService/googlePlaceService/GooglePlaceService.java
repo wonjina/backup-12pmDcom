@@ -22,6 +22,7 @@ import com.gabia.project.internproject.repository.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -52,6 +53,7 @@ public class GooglePlaceService {
     private final RestaurantRepository restaurantRepository;
     private final RestaurantImgRepository restaurantImgRepository;
     private final MemberRepository memberRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     private ObjectMapper om = new ObjectMapper();
 
@@ -154,6 +156,7 @@ public class GooglePlaceService {
                         restaurants.get(0).updateRating();
                         restaurants.get(0).updateReviewsAmount();
                     }
+
 
                     if(members.size() > 0) {
                         memberRepository.saveAll(new ArrayList<>(members.values()));
