@@ -29,7 +29,7 @@ class MenuTest {
     public void 메뉴_validation_check(){
         /* Create Entity */
         System.out.println("===========================0");
-        Menu menu = Menu.builder().name("asdf").price(22).restaurant(new Restaurant()).build();
+        Menu menu = Menu.builder().name("asdf").price("22").restaurant(new Restaurant()).build();
         validate(menu);
 
         System.out.println("===========================1");
@@ -41,18 +41,18 @@ class MenuTest {
         validate(menu3);
 
         System.out.println("===========================3");
-        Menu menu4 = Menu.builder().name("asdf").price(1).restaurant(new Restaurant()).build();
+        Menu menu4 = Menu.builder().name("asdf").price("1").restaurant(new Restaurant()).build();
         validate(menu4);
 
         System.out.println("===========================4");
-        Menu menu5 = Menu.builder().name("asdf").price(1).build();
+        Menu menu5 = Menu.builder().name("asdf").price("1").build();
         validate(menu5);
 
         /* Change Entity */
-        assertThat(menu.changePrice(22)).isTrue();
-        assertThat(menu.changePrice(1)).isTrue();
-        assertThat(menu.changePrice(0)).isFalse();
-        assertThat(menu.changePrice(-2)).isFalse();
+        assertThat(menu.changePrice("22")).isTrue();
+        assertThat(menu.changePrice("1")).isTrue();
+        assertThat(menu.changePrice("0")).isTrue();
+        assertThat(menu.changePrice("-2")).isFalse();
     }
 
 }

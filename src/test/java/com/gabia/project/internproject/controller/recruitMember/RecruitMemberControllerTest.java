@@ -64,6 +64,8 @@ class RecruitMemberControllerTest {
                 .loadAddress("12345")
                 .locationX(123)
                 .locationY(456)
+                .reviewAmount(1L)
+                .rating(1)
                 .zipCode("12345")
                 .build();
 
@@ -163,60 +165,8 @@ class RecruitMemberControllerTest {
                 .andDo(MockMvcResultHandlers.print());
 
         mockMvc.perform(MockMvcRequestBuilders
-                .delete(Url.RecruitBoards.getUrl()+"/"+recruitBoard.getId()+Url.RecruitMember.getUrl()+"/"+member2.getId()))
-                .andExpect(status().isOk()) //recruitBoard1, member2 정상 처리 확인
-                .andDo(MockMvcResultHandlers.print());
-
-        mockMvc.perform(MockMvcRequestBuilders
                 .delete(Url.RecruitBoards.getUrl()+recruitBoard.getId()+Url.RecruitMember.getUrl()+member1.getId()))
                 .andExpect(status().isNotFound()) //잘못된 url 비정상 처리 확인
-                .andDo(MockMvcResultHandlers.print());
-    }
-    
-    @Test public void 사용자_참여_정보_조회_컨트롤러_테스트() throws Exception {
-        //save
-        restaurantRepository.save(restaurant);
-        recruitBoardRepository.save(recruitBoard);
-        memberRepository.save(member1);
-        memberRepository.save(member2);
-
-        // 참여 사원
-        recruitMember1 = RecruitMember.builder()
-                .member(member1)
-                .recruitBoard(recruitBoard)
-                .build();
-        recruitMember2 = RecruitMember.builder()
-                .member(member2)
-                .recruitBoard(recruitBoard)
-                .build();
-        recruitMemberRepository.save(recruitMember1);
-        recruitMemberRepository.save(recruitMember2);
-
-        LocalDateTime today = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,01)); // 오늘 00:00:01
-
-        // member id & Date 값 있음
-        mockMvc.perform(MockMvcRequestBuilders
-                .get(Url.MemberRecord.getUrl()+"/"+member1.getId()+"/recruitment/?localDateTime="+today))
-                .andExpect(status().isOk()) // 정상 처리 확인
-                .andExpect(handler().handlerType(RecruitMemberController.class)) // 담당 컨트롤러 확인
-                .andExpect(handler().methodName("userRecord")) //메소드 이름 확인
-                .andDo(MockMvcResultHandlers.print());
-
-        mockMvc.perform(MockMvcRequestBuilders
-                .get(Url.MemberRecord.getUrl()+"/"+member2.getId()+"/recruitment/?localDateTime="+today))
-                .andExpect(status().isOk()) // 정상 처리 확인
-                .andDo(MockMvcResultHandlers.print());
-
-        // member id & Date 값 없음
-        mockMvc.perform(MockMvcRequestBuilders
-                .get(Url.MemberRecord.getUrl()+"/"+member1.getId()+"/recruitment"))
-                .andExpect(status().isOk()) // 정상 처리 확인
-                .andDo(MockMvcResultHandlers.print());
-
-        // 잘못된 member id
-        mockMvc.perform(MockMvcRequestBuilders
-                .get(Url.MemberRecord.getUrl()+"/abcd"+"/recruitment/?localDateTime="+today))
-                .andExpect(status().isBadRequest()) // 비정상 처리 확인
                 .andDo(MockMvcResultHandlers.print());
     }
 

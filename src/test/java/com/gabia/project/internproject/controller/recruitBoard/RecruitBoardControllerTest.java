@@ -81,6 +81,7 @@ class RecruitBoardControllerTest {
                 .loadAddress("12345")
                 .locationX(123)
                 .locationY(456)
+                .rating(1).reviewAmount(1L)
                 .zipCode("12345")
                 .build();
 
@@ -122,40 +123,6 @@ class RecruitBoardControllerTest {
     }
 
     @Test
-    public void basicCRUD() {
-        long beforeCount = recruitBoardRepository.count();
-
-        //save
-        restaurantRepository.save(restaurant);
-        recruitBoardRepository.save(recruitBoard1);
-        recruitBoardRepository.save(recruitBoard2);
-        memberRepository.save(member1);
-        memberRepository.save(member2);
-        recruitMemberRepository.save(recruitMember1);
-        recruitMemberRepository.save(recruitMember2);
-
-        //단건 조회 검증
-        RecruitBoard findBoard1 = recruitBoardRepository.findById(recruitBoard1.getId()).get();
-        RecruitBoard findBoard2 = recruitBoardRepository.findById(recruitBoard2.getId()).get();
-        assertThat(findBoard1).isEqualTo(recruitBoard1);
-        assertThat(findBoard2).isEqualTo(recruitBoard2);
-
-        //리스트 조회 검증
-        List<RecruitBoard> all = recruitBoardRepository.findAll();
-        assertThat(all.size()).isEqualTo(beforeCount+2);
-
-        //카운트 검증
-        long count = recruitBoardRepository.count();
-        assertThat(count).isEqualTo(beforeCount+2);
-
-        //삭제 검증
-        recruitBoardRepository.delete(recruitBoard1);
-        recruitBoardRepository.delete(recruitBoard2);
-        long deletedCount = recruitBoardRepository.count();
-        assertThat(deletedCount).isEqualTo(beforeCount);
-    }
-
-    @Test
     public void 모집글_상세조회_컨트롤러() throws Exception  {
         //save
         restaurantRepository.save(restaurant);
@@ -187,31 +154,6 @@ class RecruitBoardControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.get(Url.RecruitBoardInfo.getUrl()+"/abcd"))
                 .andExpect(status().isBadRequest()) // 잘못된 파라미터 비정상 처리 확인
-                .andDo(MockMvcResultHandlers.print());
-    }
-
-    @Test
-    public void 모집글_조회_컨트롤러() throws Exception {
-        // 전체 조회
-        mockMvc.perform(MockMvcRequestBuilders.get(Url.RecruitBoards.getUrl()))
-                .andExpect(status().isOk()) // 정상 처리 확인
-                .andExpect(handler().handlerType(RecruitBoardController.class)) // 담당 컨트롤러 확인
-                .andExpect(handler().methodName("allRecruitment")) // 메소드 이름 확인
-                .andDo(MockMvcResultHandlers.print());
-
-        LocalDateTime today = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,01)); // 오늘 00:00:01
-        LocalDateTime tomorrow = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(0,0,01)); // 내일 00:00:01
-
-        mockMvc.perform(MockMvcRequestBuilders.get(Url.RecruitBoards.getUrl()+"?localDateTime="+today))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print()); // content:[오늘 이후 게시글들]
-
-        mockMvc.perform(MockMvcRequestBuilders.get(Url.RecruitBoards.getUrl()+"?localDateTime="+tomorrow))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print()); // content:[내일 이후 게시글들] = 0개
-
-        mockMvc.perform(MockMvcRequestBuilders.get(Url.RecruitBoards.getUrl()+"/abcd"))
-                .andExpect(status().isBadRequest())
                 .andDo(MockMvcResultHandlers.print());
     }
 

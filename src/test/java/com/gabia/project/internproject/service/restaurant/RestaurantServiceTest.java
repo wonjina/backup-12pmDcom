@@ -44,6 +44,7 @@ class RestaurantServiceTest {
                 .loadAddress("12345")
                 .locationX(123)
                 .locationY(456)
+                .rating(1).reviewAmount(1L)
                 .zipCode("12345")
                 .build();
         sampleRestaurant = restaurantRepository.save(sampleRestaurant);

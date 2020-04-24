@@ -45,6 +45,8 @@ class ReviewRepositoryTest {
     public void 리뷰쓰기() {
         Member member = Member.builder().department("test부서").employeeNumber("testnumber").name("test name").build();
         Restaurant restaurant = Restaurant.builder().name("test 가게이름").cellNumber("1245781")
+                .rating(1)
+                .reviewAmount(1L)
                 .loadAddress("테스트 주소").build();
         memberRepository.save(member);
         restaurantRepository.save(restaurant);
@@ -72,6 +74,8 @@ class ReviewRepositoryTest {
                 .loadAddress("12345")
                 .locationX(123)
                 .locationY(456)
+                .rating(1)
+                .reviewAmount(1L)
                 .zipCode("12345")
                 .build();
         restaurantRepository.save(restaurant);

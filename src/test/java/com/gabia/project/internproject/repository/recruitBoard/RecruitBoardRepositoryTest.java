@@ -55,6 +55,8 @@ class RecruitBoardRepositoryTest {
                 .loadAddress("12345")
                 .locationX(123)
                 .locationY(456)
+                .rating(1)
+                .reviewAmount(0L)
                 .zipCode("12345")
                 .build();
 
@@ -149,11 +151,6 @@ class RecruitBoardRepositoryTest {
 
         RecruitBoard detailRecruit1 = recruitBoardRepository.findById(recruitBoard1.getId()).get();
         assertThat(detailRecruit1.getAttendMemberCount()).isEqualTo(recruitBoard1.getRecruitMembers().size());
-
-        RecruitBoard recruitBoardTest = recruitBoardRepository.findRecruitBoardById(recruitBoard1.getId()).orElseThrow(Exception::new);
-
-        assertThat(recruitBoardTest.getRecruitMembers().get(0).getId()).isEqualTo(recruitMember1.getId());
-
 
         /**
          * 삭제 Test
