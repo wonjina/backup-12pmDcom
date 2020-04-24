@@ -31,6 +31,8 @@ class RestaurantImgRepositoryTest {
                 .loadAddress("12345")
                 .locationX(123)
                 .locationY(456)
+                .reviewAmount(1L)
+                .rating(1)
                 .zipCode("12345")
                 .build();
         restaurantRepository.save(restaurant);

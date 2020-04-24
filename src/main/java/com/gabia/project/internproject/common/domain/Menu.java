@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,8 +31,8 @@ public class Menu {
     @NotBlank(message = "메뉴 이름을 입력해주세요")
     private String name;
 
-    @Min(1)
-    private int price;
+    @NotNull
+    private String price;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,14 +40,17 @@ public class Menu {
     private Restaurant restaurant;
 
     @Builder
-    public Menu(String name, int price, Restaurant restaurant) {
+    public Menu(String name, String price, Restaurant restaurant) {
         this.name = name;
         this.price = price;
         this.restaurant = restaurant;
     }
 
-    public boolean changePrice(int price) {
-        if(price <= 0) {
+    public boolean changePrice(String price) {
+        if(!StringUtils.hasText(price)) {
+            return false;
+        }
+        if(Integer.valueOf(price) < 0) {
             return false;
         }
 

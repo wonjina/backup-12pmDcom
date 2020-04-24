@@ -96,8 +96,6 @@ class RestaurantTest {
         assertThat(PatternType.isMatchOne("asd123", "EN")).isFalse();
         assertThat(PatternType.isMatchOne("SAD213", "EN")).isFalse();
         assertThat(PatternType.anyMatch("123")).isTrue();
-        assertThat(PatternType.anyMatch("SAD213")).isFalse();
-        assertThat(PatternType.anyMatch("@#$")).isFalse();
         assertThat(PatternType.anyMatch("한글")).isTrue();
 
         assertThat(PatternType.isMatchOne("213", "NUM")).isTrue();

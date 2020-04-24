@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,23 +30,23 @@ class MemberRepositoryTest {
         Member member1 = Member.builder()
                 .name("김인턴")
                 .department("개발")
-                .employeeNumber("GW12344")
+                .employeeNumber("GWTEST1")
                 .build();
         memberRepository.save(member1);
 
         Member member2 = Member.builder()
                 .name("박인턴")
                 .department("기획")
-                .employeeNumber("GM12345")
+                .employeeNumber("GWTEST2")
                 .build();
         memberRepository.save(member2);
 
         Member findMember1 = memberRepository.findMemberByEmployeeNumber(member1.getEmployeeNumber()).get();
         Member findMember2 = memberRepository.findMemberByEmployeeNumber(member2.getEmployeeNumber()).get();
 
+
         assertThat(findMember1).isEqualTo(member1);
         assertThat(findMember2).isEqualTo(member2);
-
     }
 
     @Test
@@ -54,14 +55,14 @@ class MemberRepositoryTest {
         Member member1 = Member.builder()
                 .name("김인턴")
                 .department("개발")
-                .employeeNumber("GW12344")
+                .employeeNumber("GWTEST1")
                 .build();
         memberRepository.save(member1);
 
         Member member2 = Member.builder()
                 .name("박인턴")
                 .department("기획")
-                .employeeNumber("GM12345")
+                .employeeNumber("GWTEST2")
                 .build();
         memberRepository.save(member2);
 

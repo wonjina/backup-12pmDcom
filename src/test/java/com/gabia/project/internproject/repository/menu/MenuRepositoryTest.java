@@ -35,17 +35,19 @@ class MenuRepositoryTest {
                 .locationX(123)
                 .locationY(456)
                 .zipCode("12345")
+                .reviewAmount(1L)
+                .rating(0)
                 .build();
         restaurantRepository.save(restaurant);
 
         Menu menu1 = Menu.builder()
                 .name("자장면")
-                .price(5500)
+                .price("5500")
                 .restaurant(restaurant)
                 .build();
         Menu menu2 = Menu.builder()
                 .name("짬뽕")
-                .price(6000)
+                .price("6000")
                 .restaurant(restaurant)
                 .build();
         menuRepository.save(menu1);

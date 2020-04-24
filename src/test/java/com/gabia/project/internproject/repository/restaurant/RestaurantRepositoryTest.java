@@ -89,6 +89,8 @@ class RestaurantRepositoryTest {
                 .loadAddress("12345")
                 .locationX(123)
                 .locationY(456)
+                .rating(1)
+                .reviewAmount(1L)
                 .zipCode("12345")
                 .build();
 
@@ -125,8 +127,7 @@ class RestaurantRepositoryTest {
         assertThat(beforeResCount).isNotEqualTo(restaurantRepository.count());
         assertThat(beforeReviewCount).isNotEqualTo(reviewRepository.count());
 
-        em.remove(restaurant1);
-        em.flush();
+        restaurantRepository.delete(restaurant1);
 
         assertThat(beforeResCount).isEqualTo(restaurantRepository.count());
         assertThat(beforeReviewCount).isEqualTo(reviewRepository.count());
@@ -143,7 +144,7 @@ class RestaurantRepositoryTest {
                 .locationX(123)
                 .locationY(456)
                 .rating(0)
-                .reviewAmount(0l)
+                .reviewAmount(1L)
                 .zipCode("12345")
                 .build();
         Restaurant restaurant2 = Restaurant.builder()
