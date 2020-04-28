@@ -40,6 +40,12 @@
 Restful API
 =============
 
+### 음식점
+ * 특정 가게 음식점 이미지 GET /api/restaurants/{id}/images
+ * 음식점 리스트 GET /api/restaurants
+ * 음식점 상세조회 GET /api/restaurants/{id}
+ * 이미지 리스트   GET /api/images/restaurants
+ 
 ### 리뷰
  * 리뷰 조회
   GET /api/reviews/restaurant
@@ -48,21 +54,21 @@ Restful API
 
 ### 모집 게시판
  * 모집글 조회
-  GET /api/boards/recruitment
+  GET /api/boards/recruitments
  * 모집글 상세조회
-  GET /api/boards/recruitment/{id}
+  GET /api/boards/recruitments/{id}
  * 모집글 쓰기
-  POST /api/boards/recruitment
+  POST /api/boards/recruitments
  * 모집글 참여하기
   POST /api/boards/recruitments/{postId}/members/{membersId}
  * 모집글 참여취소
-  DELETE /api/boards/recruitment/{postId}/members/{memberId}
+  DELETE /api/boards/recruitments/{postId}/members/{memberId}
 
 ### 사용자
  * 사용자 모집글 참여 이력 조회
-  GET /api/member/{id}/recruitment
+  GET /api/members/{id}/recruitment
  
-### 가게 이미지
- * 이미지 리스트
-    GET /api/imgs/restaurant/{id}
-    
+### 로그인
+* 하이웍스 로그인 Get /hiworks/oauth/callback
+* 하이웍스 사용자 조회 GET /hiworks/user
+* 로그아웃 GET /logout
