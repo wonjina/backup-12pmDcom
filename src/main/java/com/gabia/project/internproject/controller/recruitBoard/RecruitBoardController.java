@@ -28,13 +28,13 @@ public class RecruitBoardController {
     private final RecruitBoardService recruitBoardService;
 
     // 모집글 상세조회
-    @GetMapping("/api/boards/recruitment/{id}")
+    @GetMapping("/api/boards/recruitments/{id}")
     public ResponseDto detailRecruitment(@PathVariable int id) {
         return new ResponseDto(recruitBoardService.getRecruitmentDetail(id));
     }
 
     // 모집글 전체보기 (페이징)
-    @GetMapping("/api/boards/recruitment")
+    @GetMapping("/api/boards/recruitments")
     public ResponseDto allRecruitment(@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime localDateTime,
                                       @PageableDefault(page = 10, size = 5, sort = RecruitBoard_.DATE_TIME, direction = Sort.Direction.DESC) Pageable pageable,
                                       PagedResourcesAssembler<RecruitBoardListDto> assembler){
@@ -42,7 +42,7 @@ public class RecruitBoardController {
     }
 
     // 모집글 쓰기
-    @PostMapping("/api/boards/recruitment")
+    @PostMapping("/api/boards/recruitments")
     public ResponseDto newRecruitment(@RequestBody PostRequestDto postRequestDto) throws BusinessException {
         return new ResponseDto(recruitBoardService.newPost(postRequestDto));
     }
