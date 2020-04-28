@@ -1,4 +1,5 @@
-# 기능 명세서
+기능 명세서
+=============
 
 ### **음식점 리스트**
 
@@ -34,3 +35,34 @@
 4. 과거에 참여했던 모집 글 정보를 확인할 수 있다.
 
 <img src="https://user-images.githubusercontent.com/8528707/80446057-c1cc4480-8950-11ea-8fc7-760e33651594.PNG" width="90%"></img>
+
+
+Restful API
+=============
+
+### 리뷰
+ * 리뷰 조회
+  GET /api/reviews/restaurant
+ * 리뷰 쓰기
+  POST /api/reviews/restaurant
+
+### 모집 게시판
+ * 모집글 조회
+  GET /api/boards/recruitment
+ * 모집글 상세조회
+  GET /api/boards/recruitment/{id}
+ * 모집글 쓰기
+  POST /api/boards/recruitment
+ * 모집글 참여하기
+  POST /api/boards/recruitments/{postId}/members/{membersId}
+ * 모집글 참여취소
+  DELETE /api/boards/recruitment/{postId}/members/{memberId}
+
+### 사용자
+ * 사용자 모집글 참여 이력 조회
+  GET /api/member/{id}/recruitment
+ 
+### 가게 이미지
+ * 이미지 리스트
+    GET /api/imgs/restaurant/{id}
+    
