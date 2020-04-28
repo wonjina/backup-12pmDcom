@@ -26,19 +26,19 @@ public class RecruitMemberController {
     private final RecruitBoardService recruitBoardService;
 
     // 모집글 참여
-    @PostMapping("/api/boards/recruitment/{boardId}/members/{memberId}")
+    @PostMapping("/api/boards/recruitments/{boardId}/members/{memberId}")
     public ResponseDto joinRecruitment(@PathVariable int boardId, @PathVariable int memberId) throws BusinessException {
         return new ResponseDto(recruitMemberService.joinPost(boardId, memberId));
     }
     
     // 모집글 참여 취소
-    @DeleteMapping("/api/boards/recruitment/{boardId}/members/{memberId}")
+    @DeleteMapping("/api/boards/recruitments/{boardId}/members/{memberId}")
     public ResponseDto leaveRecruitment(@PathVariable int boardId, @PathVariable int memberId) throws BusinessException {
         return new ResponseDto(recruitBoardService.leavePost(boardId, memberId));
     }
 
     // 사용자 참여 정보 조회
-    @GetMapping("/api/member/{id}/recruitment")
+    @GetMapping("/api/members/{id}/recruitment")
     public ResponseDto userRecord(@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime localDateTime,
                                   @PathVariable int id, Pageable pageable, PagedResourcesAssembler<RecruitMemberDto> assembler)
             throws BusinessException {
